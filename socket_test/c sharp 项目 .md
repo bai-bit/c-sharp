@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Net.NetworkInformation;
-using System.Diagnostics;
-//using System.Timers.Timer;
+# c sharp 项目
 
-using System.IO;
-using System.Reflection;
-using System.Globalization;
+## 项目描述
 
-namespace socket_test
+​	软件名称：有人lora集中器服务器
+
+​	实现的功能：
+
+​	获取本机的ip地址，由于电脑上也许会有多个ip地址，这里我只取ip地址列表中的第一个ip地址，并显示在屏幕上，如果不是需要绑定的IP地址，可以手动修改。
+
+​	端口号是固定的号码，然后点击监听，在程序上，绑定文本框中的ip地址和端口号。设置等待连接队列，被动监听状态，可以被客户端搜索到这个服务器。然后是等待连接，如果被客户端监听到，开始三次握手的过程，创建连接。连接成功后，在屏幕上打印信息。提示用户，是哪个客户机连接，端口号是多少，ip地址是多少。
+
+​	然后在现实文本框中现实客户机发送的信息，在这里，是显示经过处理的信息。不断的将客户端发送过来的信息追加到文本框中。一共用十五个节点，每个节点每隔五秒发送一次温度信息，客户机在收到一个节点的温度信息后就立即发送给服务器。服务器收到来自客户机的信息后，进行拆包处理，把温度信息和节点编号打印到屏幕上。
+
+​	可以将服务器接收到的信息保存到文件中，也可以选择将打印出来的信息保存到文件中。
+
+​	下面是c#代码，我是第一次接触这个编程语言，看着教程做的。需要什么功能就直接去百度。对这个编程语言了解非常少，而且这个项目的代码也很烂。仅供我自己学习使用。
+
+```c#
+amespace socket_test
 {
     public partial class Form1 : Form
     {
@@ -29,8 +28,9 @@ namespace socket_test
         int[] node_online_flag = new int[15] ;
         //开启定时器，单位为毫秒
         int time = 0;
-        System.Timers.Timer t = new System.Timers.Timer(5000);
-        //追加到文件中
+        System.Timers.Timer t = new System.Timers.Timer(5000); //开启定时器
+        //追加到文件中，要想对文件进行操作，就必须申明下面两个变量
+        //一个是用来操作文件流一个是用来向文件中写入数据的流
         static FileStream fs;
         static StreamWriter sw;
 
@@ -51,14 +51,13 @@ namespace socket_test
         {
             InitializeComponent();
             this.textBox4.ReadOnly = true;
-            this.textBox1.Text = new System.Net.IPAddress(Dns.GetHostByName(Dns.GetHostName()).AddressList[0].Address).ToString();
+            this.textBox1.Text = new System.Net.IPAddress(Dns.GetHostByName(Dns.GetHostName()).AddressList[0].Address).ToString();//获取本机的ip地址
 
             textBox2.Text = "1883";
-            this.textBox2.ReadOnly = true;
-            this.groupBox1.Enabled = false;
+            this.textBox2.ReadOnly = true;  //使textBox2输入框的内容不能更改
+            this.groupBox1.Enabled = false; //使groupBox1为不可操作状态
 
-
-            t.Elapsed += new System.Timers.ElapsedEventHandler(theout);//到达时间的时候执行事件；
+            t.Elapsed += new System.Timers.ElapsedEventHandler(theout); //到达时间的时候执行事件；
 
             t.AutoReset = true;//设置是执行一次（false）还是一直执行(true)；
 
@@ -66,14 +65,9 @@ namespace socket_test
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            //读取输入框中的内容
-            //判断输入的内容是否正确
-
         }
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
-            //读取输入框中的内容
-            //判断输入的内容是否正确
             textBox2.Text = "1883";
         }
 
@@ -84,7 +78,7 @@ namespace socket_test
             //创建等待连接对列
             //设置为被动监听
             //等待连接
-            socketWatch = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socketWatch = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//申请套接字
             IPAddress ip;
 
             if (button1.Text == "监听")
@@ -96,35 +90,33 @@ namespace socket_test
                 
                 ip = IPAddress.Parse(textBox1.Text);
                 
-                //this.textBox1.Text = ip.ToString();
-                //if (IsPortOccupedFun2(int.Parse(textBox2.Text)) == false)
-                //{
-
+                //if (IsPortOccupedFun2(int.Parse(textBox2.Text)) == false)//这个函数是判断套接字是否被绑定，这里用不到它
+  
                 IPEndPoint point = new IPEndPoint(ip, Convert.ToInt32(textBox2.Text));
                 
-                socketWatch.Bind(point);
+                socketWatch.Bind(point);//绑定端口号和IP地址
 
                 ShowMsg("listen success! Waiting for device connection.....");
                
-                socketWatch.Listen(10);
+                socketWatch.Listen(10);//设置为被动监听状态，等待连接队列有十个
 
-                th = new Thread(listen);
+                th = new Thread(listen);//开启新的线程，这个线程是用来等待客户机的连接的
 
-                th.IsBackground = true;
-                th.Start(socketWatch);
+                th.IsBackground = true;//将新开的线程设置为后台线程，这样，在主线程结束时，后台线程就跟着结束了
+                th.Start(socketWatch);//新线程开始执行
             }
             else
             {
                 listen_flag = false;
                 button1.Text = "监听";
                 ShowMsg("Stop listing....");
-                textBox5.AppendText("当前没有在连接中的设备" + "\r\n");
+                textBox5.AppendText("当前没有在连接中的设备" + "\r\n");//这个语句的功能就是将括号种的字符串追加到textBox中
                 t.Enabled = false;
-                this.groupBox1.Enabled = false;
+                this.groupBox1.Enabled = false;//关闭设置区域，禁止进行设置操作
 
             }
         }
-        #region//判断IP地址是否被绑定
+        #region//判断IP地址是否被绑定####这个关键字是用来合并代码用的
         /// <summary>
         /// 判断当前绑定的ip地址是否已经被绑定
         /// </summary>
@@ -163,14 +155,13 @@ namespace socket_test
         /// <param name="o"></param>
         void listen(object o)
         {
-            Socket socketwatch = o as Socket;
-            //int frame_count = 0;
+            Socket socketwatch = o as Socket;//线程中传参数
             
             while(listen_flag)
             {
-                 socketclient = socketwatch.Accept();
+                 socketclient = socketwatch.Accept();//阻塞，等待连接
 
-                ShowMsg(socketclient.RemoteEndPoint.ToString() + ":" + "connect success");
+                ShowMsg(socketclient.RemoteEndPoint.ToString() + ":" + "connect success"); //打印消息，连接成功
                 textBox5.AppendText("在线：" + socketclient.RemoteEndPoint.ToString() + "\r\n");
                 thread_flag = true;
                 
@@ -179,17 +170,14 @@ namespace socket_test
                 button2.Text = "暂停";
                 this.textBox4.ReadOnly = false;
 
-                this.groupBox1.Enabled = true;
+                this.groupBox1.Enabled = true;//使能设置区域
 
-                t.Enabled = true;//是否执行System.Timers.Timer.Elapsed事件；
+                t.Enabled = true;//是否执行System.Timers.Timer.Elapsed事件；开启定时器
                 while (thread_flag && listen_flag)
                 {
-                   //button1.Text = frame_count++.ToString ();
                     if (time_out_flag)
                     {
-                        
-
-                        if (int.Parse(textBox4.Text) < 1200)
+                        if (int.Parse(textBox4.Text) < 1200)//设置超时时间
                         {
                             timeout = int.Parse(textBox4.Text) * 2;
                         }
@@ -214,7 +202,7 @@ namespace socket_test
 
                     try
                     {
-                        int r = socketclient.Receive(buf);
+                        int r = socketclient.Receive(buf);//接受消息，阻塞态，在这里，如果等待的时间超过了上面设置的时间，就会放弃等待，返回一个错误，并提示用户，客户机掉线，
                         socket_connect_flag = true;
                         if (r == 0)
                             break;
@@ -291,17 +279,11 @@ namespace socket_test
                         //查找当前节点对应的数组元素
                         //然后将对应的元素置为N/A
                         node_online_flag[j]++;
-                        if (node_online_flag[j] == 2)
+                        if (node_online_flag[j] == 2)//节点掉线后，会返回两次到三次以上的掉线数据包，提示节点掉线
                         {
                             temData[j] = "N/A";
                         }
-                        //else
-                        //{
-
-
-                        //}
-                        //当新节点上线或者下线，都会影响到它临近节点的数据
-                    }
+                      }
                     else
                     {
                         try
@@ -315,7 +297,7 @@ namespace socket_test
                                 data[i] = buf[27 + i];
                             float temperature = ((float)(data[0] | data[1] << 8)) / 1000;
                             //temData[j] = temperature;
-                            temData[j] = Convert.ToDecimal(temperature).ToString("f3");
+                            temData[j] = Convert.ToDecimal(temperature).ToString("f3");//将数据转换成字符串，并保存在数组中
                         }
                         catch
                         {
@@ -343,24 +325,24 @@ namespace socket_test
             //创建一个数组，数组中保存温度信息。
             //时间采用刷新时间内，最后一次更新的时间戳
             //time + "," + temperature[0] + "," + temperature[1] + "," + ...
-            this.textBox6.Enabled = false;
+            this.textBox6.Enabled = false;//这句话和最后一句话，是为了防止鼠标在选中显示的数据时，下一次打印时，会打乱显示的内容
             //检测socket是否在连接状态
             if (socket_connect_flag)
                 socket_connect_flag = false;
             else
             {
-                Environment.Exit(0);
+                Environment.Exit(0);//退出程序，回收环境资源
             }
                
             if (save_file_flag)
             {
-                sw.Write(DateTime.Now.ToString("F") + "," + temData[0] + "," + temData[1] + "," + temData[2] + "," + temData[3] + "," + temData[4] + "," + temData[5] + "," + temData[6] + "," + temData[7] + "," + temData[8] + "," + temData[9] + "," + temData[10] + "," + temData[11] + "," + temData[12] + "," + temData[13] + "," + temData[14] + "," + "\r\n");
-                sw.Flush();
+                sw.Write(DateTime.Now.ToString("F") + "," + temData[0] + "," + temData[1] + "," + temData[2] + "," + temData[3] + "," + temData[4] + "," + temData[5] + "," + temData[6] + "," + temData[7] + "," + temData[8] + "," + temData[9] + "," + temData[10] + "," + temData[11] + "," + temData[12] + "," + temData[13] + "," + temData[14] + "," + "\r\n");//将数据写入文件中
+                sw.Flush();//强制刷新缓存区
             }
 
             if(time_flag)
             {
-                ShowDate(time);
+                ShowDate(time);//显示时间
             }
             try
             {
@@ -370,7 +352,7 @@ namespace socket_test
                     {
                         if (node_num_flag)
                             textBox6.AppendText("节点" + (i + 1) + "：");
-                        textBox6.AppendText(temData[i] + "," + "  ");
+                        textBox6.AppendText(temData[i] + "," + "  ");//打印节点数据，追加的方式
                         //temData[i] = "N/A";
                     }
                 }
@@ -420,7 +402,7 @@ namespace socket_test
 
         public void theout(object source, System.Timers.ElapsedEventArgs e)
         {
-            showtemperature(123);
+            showtemperature(123);//这个函数就是用来打印数据的，定时器每5秒启动一次，每一次启动，就执行这个函数
         }
         /// <summary>
         /// 向终端显示数据
@@ -627,5 +609,11 @@ namespace socket_test
                 button6.Text = "导入文件";
             }
         }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
+```

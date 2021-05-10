@@ -23,16 +23,16 @@ namespace socket_test
     public partial class Form1 : Form
     {
         //保存节点的id号
-        int[] node_id = new int[16];
+        int[] node_id = new int[16] ;
         //保存数据
         string[] temData = new string[16] { "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A" };
         int[] node_online_flag = new int[15] ;
         //开启定时器，单位为毫秒
         int time = 0;
-        System.Timers.Timer t = new System.Timers.Timer(5000);
+        System.Timers.Timer t = new System.Timers.Timer(20000);
         //追加到文件中
-        static FileStream fs;
-        static StreamWriter sw;
+        static FileStream fs_csv,fs_txt;
+        static StreamWriter sw_csv,sw_txt;
 
         Socket socketWatch;
         Socket socketclient;
@@ -52,11 +52,11 @@ namespace socket_test
             InitializeComponent();
             this.textBox4.ReadOnly = true;
             this.textBox1.Text = new System.Net.IPAddress(Dns.GetHostByName(Dns.GetHostName()).AddressList[0].Address).ToString();
-
+            
             textBox2.Text = "1883";
-            this.textBox2.ReadOnly = true;
+                       
+           // this.textBox2.ReadOnly = true;
             this.groupBox1.Enabled = false;
-
 
             t.Elapsed += new System.Timers.ElapsedEventHandler(theout);//到达时间的时候执行事件；
 
@@ -74,7 +74,7 @@ namespace socket_test
         {
             //读取输入框中的内容
             //判断输入的内容是否正确
-            textBox2.Text = "1883";
+            //textBox2.Text = "1883";
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -155,8 +155,8 @@ namespace socket_test
         #endregion
 
         #region// 监听，等待接收来自集中器的消息
-        bool time_out_flag = false;
-        int timeout = 0;
+        //bool time_out_flag = false;
+        //int timeout = 0;
         /// <summary>
         /// 监听，等待接收来自集中器的消息
         /// </summary>
@@ -184,31 +184,33 @@ namespace socket_test
                 t.Enabled = true;//是否执行System.Timers.Timer.Elapsed事件；
                 while (thread_flag && listen_flag)
                 {
-                   //button1.Text = frame_count++.ToString ();
-                    if (time_out_flag)
-                    {
-                        
+                    #region
+                    //button1.Text = frame_count++.ToString ();
+                    //if (time_out_flag)
+                    //{
 
-                        if (int.Parse(textBox4.Text) < 1200)
-                        {
-                            timeout = int.Parse(textBox4.Text) * 2;
-                        }
-                        else
-                            timeout = int.Parse(textBox4.Text) * 2;
-                    }
 
-                    try
-                    {
-                        if (timeout > 0)
-                            socketclient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, timeout * 1000);
-                        else
-                            socketclient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 60000);
-                    }
-                    catch
-                    {
+                    //    if (int.Parse(textBox4.Text) < 1200)
+                    //    {
+                    //        timeout = int.Parse(textBox4.Text) * 10;
+                    //    }
+                    //    else
+                    //        timeout = int.Parse(textBox4.Text) * 2;
+                    //}
 
-                    }
-                  
+                    //try
+                    //{
+                    //    if (timeout > 0)
+                    //        socketclient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, timeout * 1000);
+                    //    else
+                    //        socketclient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 60000);
+                    //}
+                    //catch
+                    //{
+
+                    //}
+                    #endregion
+
                     byte[] buf = new byte[512];
                     int unixtime = 0;
 
@@ -253,31 +255,48 @@ namespace socket_test
 
                     lora_node_id |= buf[9];
                     lora_node_id |= buf[8] << 8;
-                    lora_node_id |= buf[7] << 16;
-                    lora_node_id |= buf[6] << 24;
+                    //lora_node_id |= buf[7] << 16;
+                    //lora_node_id |= buf[6] << 24;
 
-                    int j = 0;
+                    int j;
                     for (j = 0; j < 15; j++)
                     {
                         if (lora_node_id == node_id[j])
+                        {
+                            //解析数据
                             break;
+                        }
                     }
 
                     //处理信息，打印消息
-                    if (j == 15)
+                    //直接显示节点的实际id号，显示后三位id号，十六进制显示
+                    if (15 == j)
                     {
-                        node_id[14] = lora_node_id;
-                        int temp = 0;
-                        //排序，分配编号
-                        for (int m = 0; m < 14; m++)
-                            for (int n = m + 1; n < 15; n++)
-                                if (node_id[m] < node_id[n])
-                                {
-                                    temp = node_id[m];
-                                    node_id[m] = node_id[n];
-                                    node_id[n] = temp;
-                                }
+                        //新加入的节点，判断为0的元素，在此位置加入新节点id号，解析数据
+                        for (j = 0; j < 15; j++)
+                            if (node_id[j] == 0)
+                            {
+                                node_id[j] = lora_node_id;
+                                break;
+                            }
                     }
+                    #region
+                    //将id号按照从大到小进行排列
+                    //if (j == 15)
+                    //{
+                    //    node_id[14] = lora_node_id;
+                    //    int temp = 0;
+                    //    //排序，分配编号
+                    //    for (int m = 0; m < 14; m++)
+                    //        for (int n = m + 1; n < 15; n++)
+                    //            if (node_id[m] < node_id[n])
+                    //            {
+                    //                temp = node_id[m];
+                    //                node_id[m] = node_id[n];
+                    //                node_id[n] = temp;
+                    //            }
+                    //}
+                    #endregion
 
                     for (j = 0; j < 15; j++)
                     {
@@ -295,12 +314,6 @@ namespace socket_test
                         {
                             temData[j] = "N/A";
                         }
-                        //else
-                        //{
-
-
-                        //}
-                        //当新节点上线或者下线，都会影响到它临近节点的数据
                     }
                     else
                     {
@@ -349,16 +362,22 @@ namespace socket_test
                 socket_connect_flag = false;
             else
             {
-                Environment.Exit(0);
-            }
-               
-            if (save_file_flag)
-            {
-                sw.Write(DateTime.Now.ToString("F") + "," + temData[0] + "," + temData[1] + "," + temData[2] + "," + temData[3] + "," + temData[4] + "," + temData[5] + "," + temData[6] + "," + temData[7] + "," + temData[8] + "," + temData[9] + "," + temData[10] + "," + temData[11] + "," + temData[12] + "," + temData[13] + "," + temData[14] + "," + "\r\n");
-                sw.Flush();
+                //Environment.Exit(0);
+
             }
 
-            if(time_flag)
+            if (save_file_flag)
+            {
+                sw_csv.Write(DateTime.Now.ToString("F") + "," + temData[0] + "," + temData[1] + "," + temData[2] + "," + temData[3] + "," + temData[4] + "," + temData[5] + "," + temData[6] + "," + temData[7] + "," + temData[8] + "," + temData[9] + "," + temData[10] + "," + temData[11] + "," + temData[12] + "," + temData[13] + "," + temData[14] + "," + "\r\n");
+                sw_csv.Flush();
+            }
+            fs_txt = new FileStream("tsic506.txt", FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            sw_txt = new StreamWriter(fs_txt, Encoding.Default);
+            sw_txt.Write(DateTime.Now.ToString("F") + ","  + Convert.ToString(node_id[0],16) + temData[0] + "," + Convert.ToString(node_id[1], 16) + temData[1] + "," + Convert.ToString(node_id[2], 16) + temData[2] + "," + Convert.ToString(node_id[3], 16) + temData[3] + "," + Convert.ToString(node_id[4], 16) + temData[4] + "," + Convert.ToString(node_id[5], 16) + temData[5] + "," + Convert.ToString(node_id[6], 16) + temData[6] + "," + Convert.ToString(node_id[7], 16) + temData[7] + "," + Convert.ToString(node_id[8], 16) + temData[8] + "," + Convert.ToString(node_id[9], 16) + temData[9] + "," + Convert.ToString(node_id[10], 16) + temData[10] + "," + Convert.ToString(node_id[11], 16) + temData[11] + "," + Convert.ToString(node_id[12], 16) + temData[12] + "," + Convert.ToString(node_id[13], 16) + temData[13] + "," + Convert.ToString(node_id[14], 16) + temData[14] + "," + "\r\n");
+            sw_txt.Flush();
+            sw_txt.Close();
+            fs_txt.Close();
+            if (time_flag)
             {
                 ShowDate(time);
             }
@@ -369,9 +388,9 @@ namespace socket_test
                     if (temData[i] != "N/A")
                     {
                         if (node_num_flag)
-                            textBox6.AppendText("节点" + (i + 1) + "：");
+                            textBox6.AppendText("节点" + Convert.ToString(node_id[i], 16) + "：");
                         textBox6.AppendText(temData[i] + "," + "  ");
-                        //temData[i] = "N/A";
+                       // temData[i] = "N/A";
                     }
                 }
                 
@@ -456,8 +475,8 @@ namespace socket_test
         {
             if (!open_file_flag)
             {
-                sw.Close();
-                fs.Close();
+                sw_csv.Close();
+                fs_csv.Close();
             }
         }
 
@@ -496,7 +515,7 @@ namespace socket_test
             //获取信息,从新设置socket的超时,将标志位置true
             if (textBox4.Text != null && textBox4.Text != "" && int.Parse(textBox4.Text) > 0)
             {
-                time_out_flag = true;
+                //time_out_flag = true;
 
                 t.Interval = int.Parse(textBox4.Text) * 1000;
             }
@@ -601,6 +620,16 @@ namespace socket_test
             }                
         }
 
+        private void groupBox2_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
         bool open_file_flag = true;
         private void button6_Click(object sender, EventArgs e)
         {
@@ -612,10 +641,10 @@ namespace socket_test
                 if (open_file_flag)
                 {
                     open_file_flag = false;
-                    fs = new FileStream("tsic506.csv", FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
-                    sw = new StreamWriter(fs, Encoding.Default);
-                    sw.Write("时间" + "," + "节点1" + "," + "节点2" + "," + "节点3" + "," + "节点4" + "," + "节点5" + "," + "节点6" + "," + "节点7" + "," + "节点8" + "," + "节点9" + "," + "节点10" + "," + "节点11" + "," + "节点12" + "," + "节点13" + "," + "节点14" + "," + "节点15" + "\r\n");
-                    sw.Flush();
+                    fs_csv = new FileStream("tsic506.csv", FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+                    sw_csv = new StreamWriter(fs_csv, Encoding.Default);
+                    sw_csv.Write("时间" + "," + "节点1" + "," + "节点2" + "," + "节点3" + "," + "节点4" + "," + "节点5" + "," + "节点6" + "," + "节点7" + "," + "节点8" + "," + "节点9" + "," + "节点10" + "," + "节点11" + "," + "节点12" + "," + "节点13" + "," + "节点14" + "," + "节点15" + "\r\n");
+                    sw_csv.Flush();
                 }
 
                 save_file_flag = true;

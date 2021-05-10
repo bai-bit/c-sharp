@@ -250,7 +250,7 @@
             this.TabPageIMUUI.Name = "TabPageIMUUI";
             this.TabPageIMUUI.Size = new System.Drawing.Size(681, 401);
             this.TabPageIMUUI.TabIndex = 3;
-            this.TabPageIMUUI.Text = "姿态显示";
+            this.TabPageIMUUI.Text = "数据显示";
             // 
             // Main
             // 

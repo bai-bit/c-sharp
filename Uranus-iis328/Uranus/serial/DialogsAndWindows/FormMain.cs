@@ -304,18 +304,19 @@ namespace Uranus
             {
                 fmTerminal = new SerialTerminalForm(m_connection);
             }
+
             fmTerminal.Show();
         }
 
-        //private void toolStripMenuItemRegsConfig_Click(object sender, EventArgs e)
-        //{
-        //    FormRegsConfig fmRegsConfig = new FormRegsConfig(m_connection);
-        //    if (fmRegsConfig.IsDisposed == true)
-        //    {
-        //        fmRegsConfig = new FormRegsConfig(m_connection);
-        //    }
-        //    fmRegsConfig.Show();
-        //}
+        private void toolStripMenuItemRegsConfig_Click(object sender, EventArgs e)
+        {
+            FormRegsConfig fmRegsConfig = new FormRegsConfig(m_connection);
+            if (fmRegsConfig.IsDisposed == true)
+            {
+                fmRegsConfig = new FormRegsConfig(m_connection);
+            }
+            fmRegsConfig.Show();
+        }
 
         #endregion
 

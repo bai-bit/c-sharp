@@ -15,7 +15,7 @@ namespace Uranus.DialogsAndWindows
 
         IMUData imuData;
         private System.Windows.Forms.Timer TextUpdateTimer = new System.Windows.Forms.Timer();
-
+        bool openconfig_flag = false;
 
         public FormIMUConfig()
         {
@@ -42,7 +42,9 @@ namespace Uranus.DialogsAndWindows
         {
             bool ret;
             ret = SendATCmd("AT+EOUT=0");
+            
             Thread.Sleep(10);
+            
 
             textBoxTerminal.Clear();
             TextQueue.Clear();
@@ -50,6 +52,8 @@ namespace Uranus.DialogsAndWindows
             TextUpdateTimer.Interval = 20;
             TextUpdateTimer.Tick += new EventHandler(TextUpdateTimer_Tick);
             TextUpdateTimer.Start();
+            openconfig_flag = true;
+            SendATCmd("AT+INFO");
         }
 
         private bool SendATCmd(string cmd)
@@ -81,8 +85,211 @@ namespace Uranus.DialogsAndWindows
             {
                 Text += mySyncdQ.Dequeue();
             }
+
+            //进行判断接收的数据
+            isnumeric(Text);
             TextQueue.Clear();
-            textBoxTerminal.AppendText(Text);
+            
+            //加标志位，在配置窗口刚打开时，和读取配置时候，不要显示信息
+            if(!openconfig_flag)
+                textBoxTerminal.AppendText(Text);
+            else
+                openconfig_flag = false;
+
+        }
+
+        public bool isnumeric(string str)
+        {
+            char[] ch = new char[str.Length];
+            ch = str.ToCharArray();
+            int num = 0;
+            int count = 0;
+            //for (int i = 0; i < str.Length; i++)
+            //{
+
+            if (str.IndexOf("ACC THRE -X:") > 0)
+                if ((num = str.IndexOf("ACC THRE -X:")) > 0)
+                {
+                    textBox1.Text = "-";
+                    for (int i = num; i < str.Length; i++)
+                    {
+                        if (ch[i] >= 48 && ch[i] <= 57)
+                        {
+                            count = i;
+                            textBox1.Text += ch[i];
+                        }
+                        if (count != 0 && count != i)
+                        {
+                            count = 0;
+                            i = str.Length;
+                        }
+                    }
+                }
+
+            if ((num = str.IndexOf("ACC THRE  X:")) > 0)
+            {
+                textBox7.Text = "";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox7.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+            if ((num = str.IndexOf("ACC THRE -Y:")) > 0)
+            {
+                textBox6.Text = "-";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox6.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+            if ((num = str.IndexOf("ACC THRE  Y:")) > 0)
+            {
+                textBox5.Text = "";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox5.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+            if ((num = str.IndexOf("ACC THRE -Z:")) > 0)
+            {
+                textBox4.Text = "-";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox4.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+            if ((num = str.IndexOf("ACC THRE  Z:")) > 0)
+            {
+                textBox3.Text = "";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox3.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+            if ((num = str.IndexOf(" HALT VALUE:")) > 0)
+            {
+                textBox2.Text = "";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox2.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+
+            if ((num = str.IndexOf(" HALT DELAY:")) > 0)
+            {
+                textBox8.Text = "";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox8.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+            if ((num = str.IndexOf(" WARN DELAY:")) > 0)
+            {
+                textBox9.Text = "";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox9.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+            if ((num = str.IndexOf(" TIMER DELAY:")) > 0)
+            {
+                textBox10.Text = "";
+                for (int i = num; i < str.Length; i++)
+                {
+                    if (ch[i] >= 48 && ch[i] <= 57)
+                    {
+                        count = i;
+                        textBox10.Text += ch[i];
+                    }
+                    if (count != 0 && count != i)
+                    {
+                        count = 0;
+                        i = str.Length;
+                    }
+                }
+            }
+
+            return true;
         }
 
 
@@ -116,7 +323,6 @@ namespace Uranus.DialogsAndWindows
             SendATCmd("AT+ODR=50");
         }
 
-
         private void button1_Click(object sender, EventArgs e)
         {
             SendATCmd("AT+EOUT=1");
@@ -127,26 +333,74 @@ namespace Uranus.DialogsAndWindows
             SendATCmd("AT+EOUT=0");
         }
 
-        //private void radioButtonMode_Click(object sender, EventArgs e)
-        //{
-        //    RadioButton rb = (RadioButton)sender;
-        //    if (sender == radioButtonMode6A && rb.Checked)
-        //    {
-        //        SendATCmd("AT+MODE=0");
-        //    }
-        //    if (sender == radioButtonMode9A && rb.Checked)
-        //    {
-        //        SendATCmd("AT+MODE=1");
-        //    }
-        //}
-
-        private void FormIMUConfig_FormClosing(object sender, FormClosingEventArgs e)
+         private void FormIMUConfig_FormClosing(object sender, FormClosingEventArgs e)
         {
             SendATCmd("AT+EOUT=1");
 
             /* fix the bug that when entering this windows, sometime, will cause hardfault */
             TextUpdateTimer.Dispose();
         }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            //低通滤波 50Hz
+            SendATCmd("AT+LOW_P=50");
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            //低通滤波 60Hz
+            SendATCmd("AT+LOW_P=60");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //低通滤波 70Hz
+            SendATCmd("AT+LOW_P=70");
+        }
+
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+            //低通滤波 140Hz
+            SendATCmd("AT+LOW_P=140");
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            //高通20Hz
+            SendATCmd("AT+HIGH_P=20");
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            //高通30Hz
+            SendATCmd("AT+HIGH_P=30");
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            //校准信息
+            SendATCmd("AT+ACC_CAL");
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        //写入配置
+        //将1到9的控件输入内容进行识别，读取，然后通过特定的命令将这些数值写入到模块中
+        private void button8_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //读取阈值配置
+        private void button9_Click(object sender, EventArgs e)
+        {
+            SendATCmd("AT+INFO");
+        }
+
 
         //private void buttonProtocol_Click(object sender, EventArgs e)
         //{

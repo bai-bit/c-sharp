@@ -50,7 +50,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 28);
+            this.label7.Location = new System.Drawing.Point(6, 26);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(53, 12);
             this.label7.TabIndex = 9;
@@ -65,7 +65,7 @@
             this.groupBox1.Size = new System.Drawing.Size(347, 51);
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "IMU数据";
+            this.groupBox1.Text = "数据";
             // 
             // labelData
             // 
@@ -87,7 +87,7 @@
             this.groupBox3.Size = new System.Drawing.Size(669, 377);
             this.groupBox3.TabIndex = 11;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Accelerometer";
+            this.groupBox3.Text = "加速度计";
             this.groupBox3.UseCompatibleTextRendering = true;
             this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter_1);
             // 

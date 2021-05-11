@@ -42,9 +42,7 @@ namespace Uranus.DialogsAndWindows
         {
             bool ret;
             ret = SendATCmd("AT+EOUT=0");
-            
             Thread.Sleep(10);
-            
 
             textBoxTerminal.Clear();
             TextQueue.Clear();
@@ -52,6 +50,9 @@ namespace Uranus.DialogsAndWindows
             TextUpdateTimer.Interval = 20;
             TextUpdateTimer.Tick += new EventHandler(TextUpdateTimer_Tick);
             TextUpdateTimer.Start();
+
+            //在打开配置窗口的时候，发送这个指令，获取配置信息。
+            //利用一个标志位，不让这些信息显示出来。只填充对应的输入框。
             openconfig_flag = true;
             SendATCmd("AT+INFO");
         }
@@ -88,6 +89,7 @@ namespace Uranus.DialogsAndWindows
 
             //进行判断接收的数据
             isnumeric(Text);
+            //清除显示窗口
             TextQueue.Clear();
             
             //加标志位，在配置窗口刚打开时，和读取配置时候，不要显示信息
@@ -104,8 +106,6 @@ namespace Uranus.DialogsAndWindows
             ch = str.ToCharArray();
             int num = 0;
             int count = 0;
-            //for (int i = 0; i < str.Length; i++)
-            //{
 
             if (str.IndexOf("ACC THRE -X:") > 0)
                 if ((num = str.IndexOf("ACC THRE -X:")) > 0)
@@ -313,16 +313,6 @@ namespace Uranus.DialogsAndWindows
             SendATCmd(textBoxCmd.Text);
         }
 
-        private void buttonINFO_Click(object sender, EventArgs e)
-        {
-            SendATCmd("AT+INFO=L");
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            SendATCmd("AT+ODR=50");
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
             SendATCmd("AT+EOUT=1");
@@ -385,14 +375,142 @@ namespace Uranus.DialogsAndWindows
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-
+            //判断输入的数字
+            //int n = int.Parse(textBox1.Text);
+            //if (n < 0)
+            //    textBox1.Text = n.ToString();
         }
 
         //写入配置
         //将1到9的控件输入内容进行识别，读取，然后通过特定的命令将这些数值写入到模块中
         private void button8_Click(object sender, EventArgs e)
         {
+            double n = 0;
+            //判断输入框的内容，不能为空，否则就退出该函数
+            if (textBox1.Text == "" || textBox2.Text == "" || textBox3.Text == "" || textBox4.Text == "" || textBox5.Text == "" || textBox6.Text == "" || textBox7.Text == "" || textBox8.Text == "" || textBox9.Text == "")
+            {
+                MessageBox.Show("不能为空");
+                return;
+            }
 
+            try
+            {
+                //判断输入的内容是否为数字。
+                //如果是数字，判断是否符合取值范围 value range
+                //只要有一个不符合，就提示用户，然后退出函数。
+
+                //-x   (0, -8000)单位是mg
+                n = double.Parse(textBox1.Text);
+                if(n > 0 ||  n  <= -8000)
+                {
+                    MessageBox.Show("-X 取值范围（0，-8000)");
+                    return;
+                }
+                
+                //x      (0, 8000)单位是mg
+                n = double.Parse(textBox7.Text);
+                if (n < 0 || n >= 8000)
+                {
+                    MessageBox.Show("X 取值范围（0，8000)");
+                    return;
+                }
+
+                // -Y     (0, -8000)单位是mg
+                n = double.Parse(textBox6.Text);
+                if (n > 0 || n <= -8000)
+                {
+                    MessageBox.Show("-Y 取值范围（0，-8000)");
+                    return;
+                }
+
+                // Y       (0, 8000)单位是mg
+                n = double.Parse(textBox5.Text);
+                if (n < 0 || n >= 8000)
+                {
+                    MessageBox.Show("Y 取值范围（0，8000)");
+                    return;
+                }
+
+                // -Z      (0, -8000)单位是mg
+                n = double.Parse(textBox4.Text);
+                if (n > 0 || n <= -8000)
+                {
+                    MessageBox.Show("-Z 取值范围（0，-8000)");
+                    return;
+                }
+
+                // Z       (0, 8000)单位是mg
+                n = double.Parse(textBox3.Text);
+                if (n < 0 || n >= 8000)
+                {
+                    MessageBox.Show("Z 取值范围（0，8000)");
+                    return;
+                }
+
+                //H        (0, 8000)且小于xyz的数值  单位是mg
+                n = double.Parse(textBox2.Text);
+                if (n < 0 || n >= 8000 )
+                {
+                    MessageBox.Show("H 取值范围（0，8000)");
+                    return;
+                }
+
+                //HD       停机报警（0, 5000)  单位是毫秒
+                n = double.Parse(textBox8.Text);
+                if (n < 0 || n >= 5000)
+                {
+                    MessageBox.Show("HD 取值范围（0，5000)");
+                    return;
+                }
+
+                //WD        高频报警（0，5000）单位是毫秒
+                n = double.Parse(textBox9.Text);
+                if (n < 0 || n >= 5000)
+                {
+                    MessageBox.Show("WD 取值范围（0，5000)");
+                    return;
+                }
+
+                //TD        停机状态检测（0， 600）单位是秒
+                n = double.Parse(textBox10.Text);
+                if (n < 0 || n >= 600)
+                {
+                    MessageBox.Show("HD 取值范围（0，600)");
+                    return;
+                }
+
+
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("写入的设置内容包含了非法字符，请重新输入！");
+            }
+
+            //判断无错误之后，重新读取，发送指令
+            SendATCmd("AT+ACC_TH=X," + double.Parse(textBox1.Text));
+            Thread.Sleep(100);
+            SendATCmd("AT+ACC_TH=X," + double.Parse(textBox7.Text));
+            Thread.Sleep(100);
+
+            SendATCmd("AT+ACC_TH=Y," + double.Parse(textBox6.Text));
+            Thread.Sleep(100);
+            SendATCmd("AT+ACC_TH=Y," + double.Parse(textBox5.Text));
+            Thread.Sleep(100);
+
+            SendATCmd("AT+ACC_TH=Z," + double.Parse(textBox4.Text));
+            Thread.Sleep(100);
+            SendATCmd("AT+ACC_TH=Z," + double.Parse(textBox3.Text));
+            Thread.Sleep(100);
+
+            SendATCmd("AT+ACC_TH=H," + double.Parse(textBox2.Text));
+            Thread.Sleep(100);
+
+            SendATCmd("AT+DELAY=H," + double.Parse(textBox8.Text));
+            Thread.Sleep(100);
+            SendATCmd("AT+DELAY=W," + double.Parse(textBox9.Text));
+            Thread.Sleep(100);
+            SendATCmd("AT+DELAY=T," + double.Parse(textBox10.Text));
+            Thread.Sleep(100);
         }
 
         //读取阈值配置
@@ -401,85 +519,12 @@ namespace Uranus.DialogsAndWindows
             SendATCmd("AT+INFO");
         }
 
-
-        //private void buttonProtocol_Click(object sender, EventArgs e)
-        //{
-        //    byte[] protocol_type = new byte[8];
-        //    int cnt = 0;
-
-        //    if (checkBoxID.Checked == true)
-        //    {
-        //        checkBox0x91.Checked = false;
-        //        protocol_type[cnt++] = 0x90;
-        //    }
-
-        //    if (checkBoxAcc.Checked == true)
-        //    {
-        //        checkBox0x91.Checked = false;
-        //        protocol_type[cnt++] = 0xA0;
-        //    }
-
-        //    if (checkBoxGyo.Checked == true)
-        //    {
-        //        checkBox0x91.Checked = false;
-        //        protocol_type[cnt++] = 0xB0;
-        //    }
-
-        //    if (checkBoxMag.Checked == true)
-        //    {
-        //        checkBox0x91.Checked = false;
-        //        protocol_type[cnt++] = 0xC0;
-        //    }
-
-        //    if (checkBoxAtdE.Checked == true)
-        //    {
-        //        checkBox0x91.Checked = false;
-        //        protocol_type[cnt++] = 0xD0;
-        //    }
-        //    if (checkBoxAtdQ.Checked == true)
-        //    {
-        //        checkBox0x91.Checked = false;
-        //        protocol_type[cnt++] = 0xD1;
-        //    }
-
-        //    if (checkBoxPressure.Checked == true)
-        //    {
-        //        checkBox0x91.Checked = false;
-        //        protocol_type[cnt++] = 0xF0;
-        //    }
-
-        //    if (checkBox0x91.Checked == true)
-        //    {
-        //        checkBox0x91.Checked = false;
-        //        protocol_type[cnt++] = 0x91;
-        //    }
-
-        //    string cmd = "AT+SETPTL=";
-        //    for (int i = 0; i < cnt; i++)
-        //    {
-        //        cmd += protocol_type[i].ToString("X") + ",";
-        //    }
-        //    if (cmd[cmd.Length - 1] == ',')
-        //    {
-        //        cmd = cmd.Substring(0, cmd.Length - 1);
-        //    }
-        //    SendATCmd(cmd);
-        //}
-
-        //private void checkBox0x91_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    if (checkBox0x91.Checked == true)
-        //    {
-        //        checkBoxID.Checked = false;
-        //        checkBoxAcc.Checked = false;
-        //        checkBoxAtdE.Checked = false;
-        //        checkBoxAtdQ.Checked = false;
-        //        checkBoxGyo.Checked = false;
-        //        checkBoxMag.Checked = false;
-        //        checkBoxPressure.Checked = false;
-        //    }
-
-        //}
+        private void textBox7_TextChanged(object sender, EventArgs e)
+        {
+            //int n = int.Parse(textBox7.Text);
+            //if (n < 0)
+            //    textBox1.Text = "ok";
+        }
     }
 
 }

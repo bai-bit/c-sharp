@@ -453,6 +453,7 @@
             this.textBox7.Size = new System.Drawing.Size(94, 21);
             this.textBox7.TabIndex = 9;
             this.textBox7.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBox7.TextChanged += new System.EventHandler(this.textBox7_TextChanged);
             // 
             // textBox6
             // 
@@ -518,7 +519,7 @@
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(75, 23);
             this.button9.TabIndex = 1;
-            this.button9.Text = "读取";
+            this.button9.Text = "读取配置";
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
@@ -528,7 +529,7 @@
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(72, 23);
             this.button8.TabIndex = 0;
-            this.button8.Text = "写入";
+            this.button8.Text = "写入配置";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 

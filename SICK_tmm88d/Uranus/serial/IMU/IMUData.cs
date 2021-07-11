@@ -91,11 +91,35 @@ namespace Uranus.Data
             imuData.CSVData.Add(DateTime.Now.ToString("HH-mm-ss.fff"));
 
             int offset = 0;
+            float a = 0;
+            float b = 0;
             while (offset < len)
             {
                 byte cmd = buf[offset];
                 switch (cmd)
                 {
+                    case (byte)ItemID.kItemRotationEular:
+
+                        imuData.SingleNode.Eul = new float[3];
+                        //imuData.SingleNode.Eul[1] = (float)BitConverter.ToInt16(buf, offset + 1) / 100;
+                        //imuData.SingleNode.Eul[0] = (float)BitConverter.ToInt16(buf, offset + 3) / 100;
+                        imuData.SingleNode.Eul[1] = (float)(Int16)(buf[1] | (buf[2] << 8)) / 100;
+                        imuData.SingleNode.Eul[0] = (float)(Int16)(buf[3] | (buf[4] << 8)) / 100;
+                        if (imuData.SingleNode.Eul[0] > 180 || imuData.SingleNode.Eul[0] < -180 || imuData.SingleNode.Eul[1] > 90 || imuData.SingleNode.Eul[1] < -90)
+                        {
+                            a = imuData.SingleNode.Eul[0];
+                            b = imuData.SingleNode.Eul[1];
+                            offset += 7;
+                            break;
+                        }
+
+                        //imuData.SingleNode.Eul[2] = (float)BitConverter.ToInt16(buf, offset + 5) / 10;
+                        offset += 7;
+                        imuData.CSVHeaders.Add("Roll(deg), Pitch, Yaw");
+                        imuData.CSVData.Add(imuData.SingleNode.Eul[0].ToString() + ',' + imuData.SingleNode.Eul[1].ToString() + ',' + imuData.SingleNode.Eul[2].ToString());
+                        imuData.ToStringData += string.Format("{0,-14}{1,7:f2}{2,7:f2}{3,7:f2}\r\n", "欧拉角RPY(deg):", imuData.SingleNode.Eul[0], imuData.SingleNode.Eul[1], imuData.SingleNode.Eul[2]);
+                        break;
+#if false
                     case (byte)ItemID.kItemID:
                         imuData.SingleNode.ID = buf[offset + 1];
                         offset += 2;
@@ -123,6 +147,9 @@ namespace Uranus.Data
                         imuData.SingleNode.Acc[0] = (float)BitConverter.ToInt16(buf, offset + 1) / 1000;
                         imuData.SingleNode.Acc[1] = (float)BitConverter.ToInt16(buf, offset + 3) / 1000;
                         imuData.SingleNode.Acc[2] = (float)BitConverter.ToInt16(buf, offset + 5) / 1000;
+                        imuData.SingleNode.Acc[0] = 100;
+                        imuData.SingleNode.Acc[1] = 200;
+                        imuData.SingleNode.Acc[2] = 3;
                         offset += 7;
                         imuData.CSVHeaders.Add("AccX(G), AccY, AccZ");
                         imuData.CSVData.Add(imuData.SingleNode.Acc[0].ToString() + ',' + imuData.SingleNode.Acc[1].ToString() + ',' + imuData.SingleNode.Acc[2].ToString());
@@ -154,10 +181,21 @@ namespace Uranus.Data
                         imuData.ToStringData += string.Format("{0,-15}{1,7:f1}{2,7:f1}{3,7:f1}\r\n", "磁场(uT):", imuData.SingleNode.Mag[0], imuData.SingleNode.Mag[1], imuData.SingleNode.Mag[2]);
                         break;
                     case (byte)ItemID.kItemRotationEular:
+                        
                         imuData.SingleNode.Eul = new float[3];
-                        imuData.SingleNode.Eul[1] = (float)BitConverter.ToInt16(buf, offset + 1) / 100;
-                        imuData.SingleNode.Eul[0] = (float)BitConverter.ToInt16(buf, offset + 3) / 100;
-                        imuData.SingleNode.Eul[2] = (float)BitConverter.ToInt16(buf, offset + 5) / 10;
+                        //imuData.SingleNode.Eul[1] = (float)BitConverter.ToInt16(buf, offset + 1) / 100;
+                        //imuData.SingleNode.Eul[0] = (float)BitConverter.ToInt16(buf, offset + 3) / 100;
+                        imuData.SingleNode.Eul[1] = (float)(Int16)(buf[1] | (buf[2] << 8)) / 100;
+                        imuData.SingleNode.Eul[0] = (float)(Int16)(buf[3] | (buf[4] << 8)) / 100;
+                        if (imuData.SingleNode.Eul[0] > 180 || imuData.SingleNode.Eul[0] < -180 || imuData.SingleNode.Eul[1] > 90 || imuData.SingleNode.Eul[1] < -90)
+                        {
+                            a = imuData.SingleNode.Eul[0];
+                            b = imuData.SingleNode.Eul[1];
+                            offset += 7;
+                            break;
+                        }
+
+                        //imuData.SingleNode.Eul[2] = (float)BitConverter.ToInt16(buf, offset + 5) / 10;
                         offset += 7;
                         imuData.CSVHeaders.Add("Roll(deg), Pitch, Yaw");
                         imuData.CSVData.Add(imuData.SingleNode.Eul[0].ToString() + ',' + imuData.SingleNode.Eul[1].ToString() + ',' + imuData.SingleNode.Eul[2].ToString());
@@ -370,6 +408,7 @@ namespace Uranus.Data
                         imuData.CSVData.Add(_CSVData);
                         offset += 8 + 76 * imuData.GW.node_num;
                         break;
+#endif
                     default:
                         // error has been occured. may be a unspported Items
                         offset++;
@@ -380,7 +419,7 @@ namespace Uranus.Data
             return imuData;
         }
 
-        #endregion
+#endregion
 
     }
 }

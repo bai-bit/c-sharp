@@ -13,7 +13,7 @@ namespace Uranus.Utilities
 
         private UInt16 MAX_PACKET_LEN = 2048;
         private UInt16 DataLen;
-        private status state = status.kStatus_Idle;
+        private status state = status.kStatus_Idle_1;
         private byte cmd;
         private int DataCounter = 0;
         private byte[] DataBuf = new byte[2048];
@@ -23,7 +23,10 @@ namespace Uranus.Utilities
 
         private enum status
         {
-            kStatus_Idle,
+            kStatus_Idle_1,
+            kStatus_Idle_2,
+            kStatus_Idle_3,
+            kStatus_Idle_4,
             kStatus_Cmd,
             kStatus_LenLow,
             kStatus_LenHigh,
@@ -32,7 +35,7 @@ namespace Uranus.Utilities
             kStatus_Data,
         };
 
-        private void KbootDecodeThread()
+         private void KbootDecodeThread()
         {
             while (true)
             {
@@ -87,75 +90,139 @@ namespace Uranus.Utilities
         {
             switch (state)
             {
-                case status.kStatus_Idle:
-                    if (c == 0x5A)
-                    {
+                case status.kStatus_Idle_1:
+                    //0x55
+                    if (c == 0x55)
+                        state = status.kStatus_Idle_2;
+                    break;
+                case status.kStatus_Idle_2:
+                    //0x55
+                    if (c == 0x55)
+                        state = status.kStatus_Idle_3;
+                    else
+                        state = status.kStatus_Idle_1;
+                    break;
+                case status.kStatus_Idle_3:
+                    //0xaa
+                    if (c == 0xAA)
+                        state = status.kStatus_Idle_4;
+                    else
+                        state = status.kStatus_Idle_1;
+                    break;
+                case status.kStatus_Idle_4:
+                    //0xaa
+                    if (c == 0xAA)
                         state = status.kStatus_Cmd;
-                    }
+                    else
+                        state = status.kStatus_Idle_1;
                     break;
                 case status.kStatus_Cmd:
-                    cmd = c;
-                    if (cmd == 0xA5)
-                    {
+                    //0x81
+                    if (c == 0x81)
                         state = status.kStatus_LenLow;
-                    }
                     else
-                    {
-                        state = status.kStatus_Idle;
-                    }
+                        state = status.kStatus_Idle_1;
                     break;
                 case status.kStatus_LenLow:
-                    DataLen = c;
-                    state = status.kStatus_LenHigh;
+                    //0x1
+                    if (c == 0x01)
+                        state = status.kStatus_LenHigh;
+                    else
+                        state = status.kStatus_Idle_1;
                     break;
                 case status.kStatus_LenHigh:
-                    DataLen += (UInt16)(c << 8);
-
-                    if (DataLen > MAX_PACKET_LEN)
-                    {
-                        state = status.kStatus_Idle;
-                    }
-                    else
-                    {
-                        state = status.kStatus_CRCLow;
-                    }
+                    //0x00
+                    state = status.kStatus_CRCLow;
                     break;
                 case status.kStatus_CRCLow:
-                    CRCReceived = c;
-                    state = status.kStatus_CRCHigh;
-                    break;
-                case status.kStatus_CRCHigh:
-                    CRCReceived += (UInt16)(c << 8);
+                    //0x00
                     DataCounter = 0;
+                    Array.Clear(DataBuf, 0, DataBuf.Length);
+                    DataBuf[DataCounter++] = 0xD0;
+                    
                     state = status.kStatus_Data;
                     break;
                 case status.kStatus_Data:
+                    //只抓四组数据
                     DataBuf[DataCounter++] = c;
-
-                    if (DataCounter >= DataLen)
+                    if (DataCounter == 14)
                     {
-                        List<byte> header = new List<byte>();
-                        header.Add(0x5A);
-                        header.Add(0xA5);
-                        header.AddRange(BitConverter.GetBytes(DataLen));
-                        CRCCalculated = crc16(0, header.ToArray(), 0, header.Count, 0x1021);
-                        CRCCalculated = crc16(CRCCalculated, DataBuf, 0, DataLen, 0x1021);
-
-                        // CRC match, Kboot successfully received a packet
-                        if (CRCCalculated == CRCReceived)
+                        if (OnPacketRecieved != null)
                         {
-                            if (OnPacketRecieved != null)
-                            {
-                                OnPacketRecieved(this, DataBuf, DataLen);
-                            }
+                            OnPacketRecieved(this, DataBuf, 14);
                         }
-                        else
-                        {
-                            //Console.WriteLine("Kboot PacketDecoder CRC check failed\r\n");
-                        }
-                        state = status.kStatus_Idle;
+                        state = status.kStatus_Idle_1;
                     }
                     break;
+                //case status.kStatus_Idle:
+                //    if (c == 0x5A)
+                //    {
+                //        state = status.kStatus_Cmd;
+                //    }
+                //    break;
+                //case status.kStatus_Cmd:
+                //    cmd = c;
+                //    if (cmd == 0xA5)
+                //    {
+                //        state = status.kStatus_LenLow;
+                //    }
+                //    else
+                //    {
+                //        state = status.kStatus_Idle;
+                //    }
+                //    break;
+                //case status.kStatus_LenLow:
+                //    DataLen = c;
+                //    state = status.kStatus_LenHigh;
+                //    break;
+                //case status.kStatus_LenHigh:
+                //    DataLen += (UInt16)(c << 8);
+
+                //    if (DataLen > MAX_PACKET_LEN)
+                //    {
+                //        state = status.kStatus_Idle;
+                //    }
+                //    else
+                //    {
+                //        state = status.kStatus_CRCLow;
+                //    }
+                //    break;
+                //case status.kStatus_CRCLow:
+                //    CRCReceived = c;
+                //    state = status.kStatus_CRCHigh;
+                //    break;
+                //case status.kStatus_CRCHigh:
+                //    CRCReceived += (UInt16)(c << 8);
+                //    DataCounter = 0;
+                //    state = status.kStatus_Data;
+                //    break;
+                //case status.kStatus_Data:
+                //    DataBuf[DataCounter++] = c;
+
+                //    if (DataCounter >= DataLen)
+                //    {
+                //        List<byte> header = new List<byte>();
+                //        header.Add(0x5A);
+                //        header.Add(0xA5);
+                //        header.AddRange(BitConverter.GetBytes(DataLen));
+                //        CRCCalculated = crc16(0, header.ToArray(), 0, header.Count, 0x1021);
+                //        CRCCalculated = crc16(CRCCalculated, DataBuf, 0, DataLen, 0x1021);
+
+                //        // CRC match, Kboot successfully received a packet
+                //        if (CRCCalculated == CRCReceived)
+                //        {
+                //            if (OnPacketRecieved != null)
+                //            {
+                //                OnPacketRecieved(this, DataBuf, DataLen);
+                //            }
+                //        }
+                //        else
+                //        {
+                //            //Console.WriteLine("Kboot PacketDecoder CRC check failed\r\n");
+                //        }
+                //        state = status.kStatus_Idle;
+                //    }
+                //    break;
             }
         }
 

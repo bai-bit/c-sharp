@@ -211,25 +211,26 @@
             this.toolStripMenuItemHelp.Name = "toolStripMenuItemHelp";
             this.toolStripMenuItemHelp.Size = new System.Drawing.Size(44, 21);
             this.toolStripMenuItemHelp.Text = "帮助";
+            this.toolStripMenuItemHelp.Visible = false;
             // 
             // toolStripMenuItemAbout0
             // 
             this.toolStripMenuItemAbout0.Name = "toolStripMenuItemAbout0";
-            this.toolStripMenuItemAbout0.Size = new System.Drawing.Size(124, 22);
+            this.toolStripMenuItemAbout0.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemAbout0.Text = "版本";
             this.toolStripMenuItemAbout0.Click += new System.EventHandler(this.toolStripMenuItemAbout0_Click);
             // 
             // toolStripMenuItemGuide
             // 
             this.toolStripMenuItemGuide.Name = "toolStripMenuItemGuide";
-            this.toolStripMenuItemGuide.Size = new System.Drawing.Size(124, 22);
+            this.toolStripMenuItemGuide.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemGuide.Text = "关于我们";
             this.toolStripMenuItemGuide.Click += new System.EventHandler(this.toolStripMenuItemGuide_Click);
             // 
             // 购买ToolStripMenuItem
             // 
             this.购买ToolStripMenuItem.Name = "购买ToolStripMenuItem";
-            this.购买ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.购买ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.购买ToolStripMenuItem.Text = "购买";
             this.购买ToolStripMenuItem.Click += new System.EventHandler(this.购买ToolStripMenuItem_Click);
             // 

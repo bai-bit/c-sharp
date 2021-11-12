@@ -78,7 +78,7 @@ namespace Uranus.DialogsAndWindows
 
             if (imuData.SingleNode.Eul != null)
             {
-             //   attitudeIndicatorInstrumentControl1.SetAttitudeIndicatorParameters(-(double)imuData.SingleNode.Eul[1], (double)imuData.SingleNode.Eul[0]);
+                //attitudeIndicatorInstrumentControl1.SetAttitudeIndicatorParameters(-(double)imuData.SingleNode.Eul[1], (double)imuData.SingleNode.Eul[0]);
 
                 int aircraftHeading = 0;
                 try
@@ -96,11 +96,11 @@ namespace Uranus.DialogsAndWindows
                 {
                     aircraftHeading += 360;
                 }
-              //  headingIndicatorInstrumentControl1.SetHeadingIndicatorParameters(aircraftHeading);
+                //headingIndicatorInstrumentControl1.SetHeadingIndicatorParameters(aircraftHeading);
             }
 
-            // altimeterInstrumentControl1.SetAlimeterParameters(Convert.ToInt32(Pa));
-         //   airSpeedIndicatorInstrumentControl1.SetAirSpeedIndicatorParameters(SampleCounter.SampleRate);
+            //altimeterInstrumentControl1.SetAlimeterParameters(Convert.ToInt32(Pa));
+            //airSpeedIndicatorInstrumentControl1.SetAirSpeedIndicatorParameters(SampleCounter.SampleRate);
             label7.Text = "帧率: " + SampleCounter.SampleRate.ToString() + "Hz";
         }
 
@@ -184,15 +184,11 @@ namespace Uranus.DialogsAndWindows
                 return;
             }
 
-            GrapicWindowForm graph = new GrapicWindowForm(DefaultGraphSettings.GetSettings(name));
-            Active_GraphWindows.Add(name, graph);
+            GrapicWindowForm graph = new GrapicWindowForm(DefaultGraphSettings.GetSettings(name));  //生成窗体结构
+            Active_GraphWindows.Add(name, graph);                                     //添加数据
 
-            //Active_GraphWindows[name].FormClosed += Graph_FormClosed;
-            //  Active_GraphWindows[name].Show();
-            //grapic = new GrapicWindowForm(DefaultGraphSettings.GetSettings("Accelerometer"));
-            graph.TopLevel = false;
+            graph.TopLevel = false;   
             groupBox3.Controls.Add(graph);
-
             graph.FormBorderStyle = FormBorderStyle.None;
             graph.Dock = DockStyle.Fill;
             graph.Show();
@@ -248,21 +244,5 @@ namespace Uranus.DialogsAndWindows
 
 
         #endregion
-
-       
-        GrapicWindowForm grapic;
-
-
-
-        private void groupBox3_Enter_1(object sender, EventArgs e)
-        {
-            grapic = new GrapicWindowForm(DefaultGraphSettings.GetSettings("Accelerometer"));
-            grapic.TopLevel = false;
-            groupBox3.Controls.Add(grapic);
-            grapic.FormBorderStyle = FormBorderStyle.None;
-            grapic.Dock = DockStyle.Fill;
-
-            grapic.Show();
-        }
     }
 }

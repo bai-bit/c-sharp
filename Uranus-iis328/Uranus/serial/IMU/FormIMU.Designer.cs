@@ -89,7 +89,7 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "加速度计";
             this.groupBox3.UseCompatibleTextRendering = true;
-            this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter_1);
+
             // 
             // FormIMU
             // 

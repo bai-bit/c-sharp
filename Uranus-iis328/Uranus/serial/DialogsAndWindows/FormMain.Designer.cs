@@ -83,7 +83,7 @@
             this.toolStripMenuItemSerial.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemOpenSerialConnectionDialog});
             this.toolStripMenuItemSerial.Name = "toolStripMenuItemSerial";
-            this.toolStripMenuItemSerial.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItemSerial.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemSerial.Text = "串口";
             this.toolStripMenuItemSerial.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolStripMenuItemSerialPort_DropDownItemClicked);
             // 
@@ -112,7 +112,7 @@
             // 
             this.toolStripMenuItem3DView.CheckOnClick = true;
             this.toolStripMenuItem3DView.Name = "toolStripMenuItem3DView";
-            this.toolStripMenuItem3DView.Size = new System.Drawing.Size(116, 22);
+            this.toolStripMenuItem3DView.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem3DView.Text = "3D显示";
             this.toolStripMenuItem3DView.Visible = false;
             this.toolStripMenuItem3DView.Click += new System.EventHandler(this.toolStripMenuItem3DView_Click);
@@ -120,14 +120,14 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(113, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             this.toolStripSeparator1.Visible = false;
             // 
             // toolStripMenuItemGyro
             // 
             this.toolStripMenuItemGyro.CheckOnClick = true;
             this.toolStripMenuItemGyro.Name = "toolStripMenuItemGyro";
-            this.toolStripMenuItemGyro.Size = new System.Drawing.Size(116, 22);
+            this.toolStripMenuItemGyro.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemGyro.Tag = "Gyroscope";
             this.toolStripMenuItemGyro.Text = "角速度";
             this.toolStripMenuItemGyro.Visible = false;
@@ -137,7 +137,7 @@
             // 
             this.toolStripMenuItemAcc.CheckOnClick = true;
             this.toolStripMenuItemAcc.Name = "toolStripMenuItemAcc";
-            this.toolStripMenuItemAcc.Size = new System.Drawing.Size(116, 22);
+            this.toolStripMenuItemAcc.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemAcc.Tag = "Accelerometer";
             this.toolStripMenuItemAcc.Text = "加速度";
             this.toolStripMenuItemAcc.CheckStateChanged += new System.EventHandler(this.toolStripMenuItem_CheckStateChanged);
@@ -146,7 +146,7 @@
             // 
             this.toolStripMenuItemMag.CheckOnClick = true;
             this.toolStripMenuItemMag.Name = "toolStripMenuItemMag";
-            this.toolStripMenuItemMag.Size = new System.Drawing.Size(116, 22);
+            this.toolStripMenuItemMag.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemMag.Tag = "Magnetometer";
             this.toolStripMenuItemMag.Text = "磁场";
             this.toolStripMenuItemMag.Visible = false;
@@ -156,7 +156,7 @@
             // 
             this.toolStripMenuItemEuler.CheckOnClick = true;
             this.toolStripMenuItemEuler.Name = "toolStripMenuItemEuler";
-            this.toolStripMenuItemEuler.Size = new System.Drawing.Size(116, 22);
+            this.toolStripMenuItemEuler.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemEuler.Tag = "Euler Angles";
             this.toolStripMenuItemEuler.Text = "欧拉角";
             this.toolStripMenuItemEuler.Visible = false;
@@ -216,21 +216,21 @@
             // toolStripMenuItemAbout0
             // 
             this.toolStripMenuItemAbout0.Name = "toolStripMenuItemAbout0";
-            this.toolStripMenuItemAbout0.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemAbout0.Size = new System.Drawing.Size(124, 22);
             this.toolStripMenuItemAbout0.Text = "版本";
             this.toolStripMenuItemAbout0.Click += new System.EventHandler(this.toolStripMenuItemAbout0_Click);
             // 
             // toolStripMenuItemGuide
             // 
             this.toolStripMenuItemGuide.Name = "toolStripMenuItemGuide";
-            this.toolStripMenuItemGuide.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemGuide.Size = new System.Drawing.Size(124, 22);
             this.toolStripMenuItemGuide.Text = "关于我们";
             this.toolStripMenuItemGuide.Click += new System.EventHandler(this.toolStripMenuItemGuide_Click);
             // 
             // 购买ToolStripMenuItem
             // 
             this.购买ToolStripMenuItem.Name = "购买ToolStripMenuItem";
-            this.购买ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.购买ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.购买ToolStripMenuItem.Text = "购买";
             this.购买ToolStripMenuItem.Click += new System.EventHandler(this.购买ToolStripMenuItem_Click);
             // 

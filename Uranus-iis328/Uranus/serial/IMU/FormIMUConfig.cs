@@ -15,8 +15,6 @@ namespace Uranus.DialogsAndWindows
 
         IMUData imuData;
         private System.Windows.Forms.Timer TextUpdateTimer = new System.Windows.Forms.Timer();
-        bool openconfig_flag = false;
-
         public FormIMUConfig()
         {
             InitializeComponent();
@@ -53,7 +51,6 @@ namespace Uranus.DialogsAndWindows
 
             //在打开配置窗口的时候，发送这个指令，获取配置信息。
             //利用一个标志位，不让这些信息显示出来。只填充对应的输入框。
-            openconfig_flag = true;
             SendATCmd("AT+INFO");
         }
 
@@ -93,10 +90,8 @@ namespace Uranus.DialogsAndWindows
             TextQueue.Clear();
             
             //加标志位，在配置窗口刚打开时，和读取配置时候，不要显示信息
-            if(!openconfig_flag)
-                textBoxTerminal.AppendText(Text);
-            else
-                openconfig_flag = false;
+  
+            textBoxTerminal.AppendText(Text);
 
         }
 
